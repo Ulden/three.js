@@ -59,15 +59,17 @@ THREE.Box3.prototype = {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var v1 = new THREE.Vector3();
+		var box;
 
 		return function ( object ) {
 
+			if ( box === undefined ) box = new THREE.Box3();
+
 			var scope = this;
 
-			object.updateMatrixWorld( true );
-
 			this.makeEmpty();
+
+			object.updateMatrixWorld( true );
 
 			object.traverse( function ( node ) {
 
@@ -75,35 +77,15 @@ THREE.Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
+					if ( geometry.boundingBox === null ) {
 
-						var vertices = geometry.vertices;
-
-						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-							v1.copy( vertices[ i ] );
-
-							v1.applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
-
-					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
-
-						var positions = geometry.attributes[ 'position' ].array;
-
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-
-							v1.applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
+						geometry.computeBoundingBox();
 
 					}
+
+					box.copy( geometry.boundingBox );
+					box.applyMatrix4( node.matrixWorld );
+					scope.union( box );
 
 				}
 
@@ -139,7 +121,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	empty: function () {
+	isEmpty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
@@ -247,14 +229,6 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
-
-		console.warn( 'THREE.Box3: .isIntersectionBox() has been renamed to .intersectsBox().' );
-
-		return this.intersectsBox( box );
-
-	},
-
 	intersectsSphere: ( function () {
 
 		var closestPoint;
@@ -273,11 +247,50 @@ THREE.Box3.prototype = {
 
 	} )(),
 
-	isIntersectionSphere: function ( sphere ) {
+	intersectsPlane: function ( plane ) {
 
-		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
 
-		return this.intersectsSphere( sphere );
+		var min, max;
+
+		if ( plane.normal.x > 0 ) {
+
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+
+		} else {
+
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+
+		}
+
+		if ( plane.normal.y > 0 ) {
+
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+
+		} else {
+
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+
+		}
+
+		if ( plane.normal.z > 0 ) {
+
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+
+		} else {
+
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+
+		}
+
+		return ( min <= plane.constant && max >= plane.constant );
 
 	},
 

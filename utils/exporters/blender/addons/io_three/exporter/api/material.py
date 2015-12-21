@@ -199,7 +199,7 @@ def normal_scale(material):
     logger.debug("material.normal_scale(%s)", material)
     for texture in _valid_textures(material):
         if texture.use_map_normal:
-            return texture.normal_factor
+            return (texture.normal_factor, texture.normal_factor)
 
 
 @_material
@@ -242,6 +242,9 @@ def shading(material):
         True: constants.PHONG,
         False: constants.LAMBERT
     }
+
+    if material.use_shadeless:
+        return constants.BASIC
 
     return dispatch[material.specular_intensity > 0.0]
 

@@ -173,11 +173,15 @@ THREE.Plane.prototype = {
 
 	},
 
-	isIntersectionLine: function ( line ) {
+	intersectsBox: function ( box ) {
 
-		console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
+		return box.intersectsPlane( this );
 
-		return this.intersectsLine( line );
+	},
+
+	intersectsSphere: function ( sphere ) {
+
+		return sphere.intersectsPlane( this );
 
 	},
 

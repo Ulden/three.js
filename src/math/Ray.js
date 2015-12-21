@@ -234,8 +234,6 @@ THREE.Ray.prototype = {
 
 	intersectSphere: function () {
 
-		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
-
 		var v1 = new THREE.Vector3();
 
 		return function ( sphere, optionalTarget ) {
@@ -276,14 +274,6 @@ THREE.Ray.prototype = {
 	intersectsSphere: function ( sphere ) {
 
 		return this.distanceToPoint( sphere.center ) <= sphere.radius;
-
-	},
-
-	isIntersectionSphere: function ( sphere ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
-
-		return this.intersectsSphere( sphere );
 
 	},
 
@@ -356,17 +346,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	isIntersectionPlane: function ( plane ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionPlane() has been renamed to .intersectsPlane().' );
-
-		return this.intersectsPlane( plane );
-
-	},
-
 	intersectBox: function ( box, optionalTarget ) {
-
-		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
 		var tmin, tmax, tymin, tymax, tzmin, tzmax;
 
@@ -446,14 +426,6 @@ THREE.Ray.prototype = {
 		};
 
 	} )(),
-
-	isIntersectionBox: function ( box ) {
-
-		console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
-
-		return this.intersectsBox( box );
-
-	},
 
 	intersectTriangle: function () {
 

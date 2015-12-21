@@ -126,12 +126,9 @@ THREE.Loader.prototype = {
 
 				switch ( name ) {
 					case 'DbgColor':
-						json.color = value;
-						break;
 					case 'DbgIndex':
 					case 'opticalDensity':
 					case 'illumination':
-						// These were never supported
 						break;
 					case 'DbgName':
 						json.name = value;
@@ -230,10 +227,10 @@ THREE.Loader.prototype = {
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
 						json.opacity = value;
 						break;
-					case 'opacity':
-					case 'transparent':
 					case 'depthTest':
 					case 'depthWrite':
+					case 'opacity':
+					case 'reflectivity':
 					case 'transparent':
 					case 'visible':
 					case 'wireframe':
@@ -250,7 +247,9 @@ THREE.Loader.prototype = {
 
 			}
 
+			if ( json.type === 'MeshBasicMaterial' ) delete json.emissive;
 			if ( json.type !== 'MeshPhongMaterial' ) delete json.specular;
+
 			if ( json.opacity < 1 ) json.transparent = true;
 
 			materialLoader.setTextures( textures );
